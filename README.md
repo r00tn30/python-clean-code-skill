@@ -1,199 +1,59 @@
-# Python Clean Code Skill
+# python-clean-code
 
-A comprehensive skill for writing clean Python code. This skill provides 23 code smells and 70 refactoring techniques expressed in idiomatic Python.
+An agent skill for writing and reviewing clean, idiomatic, modern Python (3.10+). It works with Cursor, Claude Code, and other tools that support the `SKILL.md` format.
 
-## What This Skill Does
+The skill guides the agent toward clear names, focused functions, domain types instead of loose primitives, explicit error handling, and low coupling. It also tells the agent to defer to your project's existing conventions and to keep changes within the task's scope.
 
-This skill acts as **proactive clean code enforcement** when writing Python. Instead of reviewing code after it's written and suggesting fixes, it applies refactoring principles *as you write*, ensuring zero technical debt from the start.
-
-### Key Features
-
-- ✅ **Proactive application** of all 23 code smells as constraints
-- ✅ **70 refactoring techniques** translated to Python idioms
-- ✅ **Comprehensive reference** with examples
-
-## Contents
+## Layout
 
 ```
 python-clean-code/
-├── SKILL.md                    # Main skill file loaded by Claude
-├── README.md                   # This file
+├── SKILL.md                    # Core rules, loaded when the skill triggers
 ├── references/
-│   └── refactoring-catalog.md  # Clean code catalog: 23 smells + 70 techniques
-└── assets/
-    └── quick-reference.md      # Visual quick reference chart
+│   ├── smells.md               # Code smells with Python-specific signs
+│   ├── refactorings.md         # Refactoring techniques with examples
+│   └── python-idioms.md        # Modelling patterns (value objects, protocols, dispatch...)
+├── evals/
+│   └── evals.md                # Prompts and expected behavior for testing changes
+└── tools/
+    └── check_examples.py       # Compiles and lints every code example in the docs
 ```
 
-## How It Works
+`SKILL.md` stays short because it is loaded on every Python task. The agent reads the reference files only when it needs them, for example when reviewing code or working out the mechanics of a refactoring.
 
-### For Claude Code Users
+## Install
 
-When this skill is installed, Claude will automatically:
-
-1. **Apply clean code principles proactively** when writing any Python code
-2. **Name refactoring techniques** as they're applied (e.g., "Applying Extract Method...")
-3. **Prevent code smells** before they're written
-4. **Suggest techniques** when reviewing existing code
-
-### Installation
+Copy or symlink the folder into your skills directory under the name `python-clean-code`:
 
 ```bash
-# If you have the .skill file
-claude-code install python-clean-code.skill
+# Cursor (personal, all projects)
+git clone https://origin.cursor.com/r00tn30/python-clean-code-skill.git ~/.cursor/skills/python-clean-code
 
-# Or manually copy to your skills directory
-cp -r python-clean-code ~/.claude/skills/
+# Claude Code
+git clone https://origin.cursor.com/r00tn30/python-clean-code-skill.git ~/.claude/skills/python-clean-code
+
+# Shared location read by several agents
+git clone https://origin.cursor.com/r00tn30/python-clean-code-skill.git ~/.agents/skills/python-clean-code
 ```
 
-### Usage Examples
+For a single project, use `.cursor/skills/python-clean-code/` inside the repository instead.
 
-#### Writing New Code
-```python
-# ❌ Without skill: Claude might write this
-def process_order(order):
-    if order['status'] == 'pending':
-        # 30 lines of processing logic...
+## How it behaves
 
-# ✅ With skill: Claude writes this automatically
-def process_order(order):
-    if not is_pending(order):
-        return
-    validate_order(order)
-    calculate_totals(order)
-    apply_discounts(order)
-    finalize_order(order)
+- **Writing code:** applies the rules without commentary in the code. It scales rigor to context: full rules for libraries and services, a light touch for scripts and notebooks.
+- **Editing existing code:** matches the surrounding style and project config (ruff, mypy, framework idioms) over its own preferences, and does not refactor outside the task. It may mention smells it noticed.
+- **Reviewing code:** names smells, explains why each matters in context, and proposes a concrete refactoring, ordered by impact.
 
-def is_pending(order):
-    return order['status'] == 'pending'
+## Maintaining the skill
 
-def validate_order(order):
-    # Focused validation logic
+Check that every Python example in the docs compiles and passes ruff:
+
+```bash
+uv run tools/check_examples.py
 ```
 
-#### Reviewing Existing Code
-When you ask Claude to review code, it will:
-- Identify specific smells by name
-- Suggest specific refactoring techniques
-- Show before/after examples
-
-## Reference Materials
-
-### Quick Reference Chart
-See `assets/quick-reference.md` for:
-- Visual guide to all 23 smells
-- Cheat sheet for all 70 techniques
-- Decision tree for choosing refactorings
-- Python-specific patterns
-
-### Complete Catalog
-See `references/refactoring-catalog.md` for:
-- Detailed explanation of each smell
-- Step-by-step refactoring techniques
-- Python code examples for each
-- Smell-to-technique mapping table
-
-## The 23 Code Smells
-
-### Bloaters
-1. Long Method
-2. Large Class
-3. Primitive Obsession
-4. Long Parameter List
-5. Data Clumps
-
-### Object-Orientation Abusers
-6. Switch Statements
-7. Temporary Field
-8. Refused Bequest
-9. Alternative Classes with Different Interfaces
-
-### Change Preventers
-10. Divergent Change
-11. Shotgun Surgery
-12. Parallel Inheritance Hierarchies
-
-### Dispensables
-13. Comments (explaining what)
-14. Duplicate Code
-15. Lazy Class
-16. Data Class
-17. Dead Code
-18. Speculative Generality
-
-### Couplers
-19. Feature Envy
-20. Inappropriate Intimacy
-21. Message Chains
-22. Middle Man
-23. Incomplete Library Class
-
-## The 70 Refactoring Techniques
-
-### Composing Methods (9)
-Extract Method • Inline Method • Extract Variable • Inline Temp • Replace Temp with Query • Split Temporary Variable • Remove Assignments to Parameters • Replace Method with Method Object • Substitute Algorithm
-
-### Moving Features (8)
-Move Method • Move Field • Extract Class • Inline Class • Hide Delegate • Remove Middle Man • Introduce Foreign Method • Introduce Local Extension
-
-### Organizing Data (16)
-Self Encapsulate Field • Replace Data Value with Object • Change Value to Reference • Change Reference to Value • Replace Array with Object • Duplicate Observed Data • Change Unidirectional to Bidirectional • Change Bidirectional to Unidirectional • Replace Magic Number with Symbolic Constant • Encapsulate Field • Encapsulate Collection • Replace Type Code with Class • Replace Type Code with Subclasses • Replace Type Code with State/Strategy • Replace Subclass with Fields • Extract Interface
-
-### Simplifying Conditionals (9)
-Decompose Conditional • Consolidate Conditional Expression • Consolidate Duplicate Conditional Fragments • Remove Control Flag • Replace Nested Conditional with Guard Clauses • Replace Conditional with Polymorphism • Introduce Null Object • Introduce Assertion • Replace Exception with Test
-
-### Simplifying Method Calls (13)
-Rename Method • Add Parameter • Remove Parameter • Separate Query from Modifier • Parameterize Method • Replace Parameter with Explicit Methods • Preserve Whole Object • Replace Parameter with Method Call • Introduce Parameter Object • Remove Setting Method • Hide Method • Replace Constructor with Factory Method • Replace Error Code with Exception
-
-### Dealing with Generalization (15)
-Pull Up Field • Pull Up Method • Pull Up Constructor Body • Push Down Method • Push Down Field • Extract Subclass • Extract Superclass • Extract Interface • Collapse Hierarchy • Form Template Method • Replace Inheritance with Delegation • Replace Delegation with Inheritance • Tease Apart Inheritance • Convert Procedural to Objects • Separate Domain from Presentation
-
-## Philosophy
-
-This skill embodies three core principles:
-
-1. **Proactive over Reactive**: Apply techniques as you write, not after code review
-2. **Named Techniques**: Think in consistent transformation vocabulary
-3. **Zero Technical Debt**: Every line of generated code should be clean from the start
-
-## Tips for Best Results
-
-1. **Let the skill work**: Don't fight its suggestions—it's applying proven techniques
-2. **Learn the names**: Understanding technique names helps you think in terms of transformations
-3. **Review the examples**: The reference materials show before/after for every technique
-4. **Iterate**: Refactoring is continuous—small improvements compound over time
-
-## Common Questions
-
-### Q: Will this make my code more verbose?
-A: Initially, yes—more functions and classes. But each piece becomes simpler and more understandable. The overall complexity decreases even as line count increases.
-
-### Q: Should I apply ALL these rules ALL the time?
-A: Use judgment. The rules are guidelines, not laws. Small scripts don't need the same rigor as production systems. But in a professional codebase, these rules prevent maintenance nightmares.
-
-### Q: What about performance?
-A: Clean code and performance are not opposites. Most refactorings have zero performance impact. When performance matters, measure first, then optimize specific hotspots while keeping the rest clean.
-
-### Q: Isn't this overkill for simple code?
-A: Simple code doesn't need these techniques. But "simple" is relative—what seems simple today becomes complex tomorrow when requirements change. These techniques make code resilient to change.
+After changing `SKILL.md`, run the prompts in `evals/evals.md` with and without the skill and confirm nothing got worse, especially the "must not" items that guard against over-engineering.
 
 ## Credits
 
-Influences:
-- **"Dive Into Refactoring"** by Alexander Shvets
-- **Python best practices** from PEP 8, PEP 20 (Zen of Python)
-- **Type hinting** from PEP 484, PEP 544 (Protocols)
-
-## License
-
-This skill is provided as-is for educational and professional use.
-
-## Contributing
-
-Found an issue? Have a suggestion? Contributions welcome:
-- Improve Python idiom translations
-- Add more examples to the catalog
-- Suggest additional refactoring patterns
-
----
-
-**Remember**: The goal is not perfect code—it's *maintainable* code that can evolve as requirements change.
+The smell and refactoring vocabulary comes from Martin Fowler's *Refactoring* and Alexander Shvets' *Dive Into Refactoring* (refactoring.guru). The descriptions and examples here are written for modern Python.
