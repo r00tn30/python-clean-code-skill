@@ -56,4 +56,6 @@ After changing `SKILL.md`, run the prompts in `evals/evals.md` with and without 
 
 ## Credits
 
+Created by [r00tn30](https://github.com/r00tn30), whose idea it was to turn the clean-code and refactoring catalog into an agent skill.
+
 The smell and refactoring vocabulary comes from Martin Fowler's *Refactoring* and Alexander Shvets' *Dive Into Refactoring* (refactoring.guru). The descriptions and examples here are written for modern Python.
