@@ -18,6 +18,8 @@ A change to `SKILL.md` should not make any of these worse.
 
 **Must not:**
 - Introduce class hierarchies or strategy objects for two simple rules.
+- Split two simple rules into a cluster of tiny helper functions.
+- Create a test file nobody asked for.
 - Add comments naming refactoring techniques.
 
 ## 2. Bug fix in existing code with its own style
@@ -32,6 +34,7 @@ A change to `SKILL.md` should not make any of these worse.
 
 **Must not:**
 - Rename existing functions, convert to dataclasses, or refactor unrelated code. (It may *mention* smells it noticed.)
+- Add type hints or test files beyond the fix.
 
 ## 3. Throwaway script
 
@@ -42,7 +45,9 @@ A change to `SKILL.md` should not make any of these worse.
 - Clear names; handles the case of a missing folder with a clear error.
 
 **Must not:**
-- Add classes, protocols, value objects, or parameter objects.
+- Add classes, custom exceptions, protocols, value objects, or parameter objects.
+- Add unrequested features such as `--dry-run` or recursion flags.
+- Split the logic into more than two or three functions.
 
 ## 4. Code review
 
@@ -116,3 +121,35 @@ def get_user(id, db, cache, log, retry=True, verbose=False):
 **Expect:**
 - Follows the framework's idioms (pydantic models / Django serializers, dependency injection, ORM querysets) over this skill's generic patterns.
 - Keeps business logic out of the route handler if the project already separates it.
+
+**Must not:**
+- Change existing endpoints, error handling, or schemas beyond what the new endpoint needs (for example, converting an existing `status: str` to an enum). It may suggest these in the reply.
+- Add a test suite when the project has none.
+
+## 9. Explicit refactoring request
+
+**Prompt:** "Refactor this to be cleaner." with:
+
+```python
+def report(orders, kind):
+    out = []
+    for o in orders:
+        if kind == "csv":
+            out.append(",".join([str(o["id"]), o["customer"], str(o["total"])]))
+        elif kind == "tsv":
+            out.append("\t".join([str(o["id"]), o["customer"], str(o["total"])]))
+        else:
+            return -1
+    if kind == "csv":
+        return "id,customer,total\n" + "\n".join(out)
+    return "id\tcustomer\ttotal\n" + "\n".join(out)
+```
+
+**Expect:**
+- Unknown format raises an exception instead of returning `-1`.
+- Duplicated row-building collapsed into one place; the format becomes a separator lookup or `StrEnum`.
+- Uses the `csv` module or an equivalent single code path.
+- Notes that there are no tests and suggests characterization tests before or alongside the change.
+
+**Must not:**
+- Build a class hierarchy or strategy objects for two separators.

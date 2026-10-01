@@ -14,7 +14,8 @@ python-clean-code/
 │   ├── refactorings.md         # Refactoring techniques with examples
 │   └── python-idioms.md        # Modelling patterns (value objects, protocols, dispatch...)
 ├── evals/
-│   └── evals.md                # Prompts and expected behavior for testing changes
+│   ├── evals.md                # Prompts and expected behavior for testing changes
+│   └── results-2026-10-01.md   # Latest results: original vs rewrite vs no skill
 └── tools/
     └── check_examples.py       # Compiles and lints every code example in the docs
 ```
@@ -52,7 +53,7 @@ Check that every Python example in the docs compiles and passes ruff:
 uv run tools/check_examples.py
 ```
 
-After changing `SKILL.md`, run the prompts in `evals/evals.md` with and without the skill and confirm nothing got worse, especially the "must not" items that guard against over-engineering.
+After changing `SKILL.md`, run the prompts in `evals/evals.md` with and without the skill and confirm nothing got worse, especially the "must not" items that guard against over-engineering. Record each run in a dated `evals/results-*.md` file.
 
 ## Credits
 
